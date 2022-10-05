@@ -1,0 +1,2 @@
+#!/bin/bash
+kill -10 $(ps aux | grep "sway-xwayland-display-fix" | awk '{print $2}')

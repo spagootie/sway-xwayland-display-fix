@@ -1,0 +1,37 @@
+#!/bin/bash
+#put the name of the output you want to be primary here
+wantedprimary="DP-3"
+
+
+
+main () {
+trap main USR1
+#gets the positions of the desired monitor, later used to determine which XWAYLAND output should be primary
+primarypos=$(swaymsg -t get_outputs -p | grep -A 2 "$wantedprimary" | tail -n 1 | awk '{print $2}')
+
+#x and y of the monitor 
+swayposx=$(echo $primarypos | cut -d ',' -f 1)
+swayposy=$(echo $primarypos | cut -d ',' -f 2)
+
+#go through the XWAYLAND displays to find the one that matches the position of the desired monitor and set it as primary
+
+xwaylandposx=$(xrandr | grep  XWAYLAND | cut -d '+' -f 2 | head -n 1)
+xwaylandposy=$(xrandr | grep  XWAYLAND | cut -d '+' -f 3 | awk '{print $1}' | head -n 1)
+index=1
+while [[ $swayposx != $xwaylandposx || $swayposy != $xwaylandposy ]];
+do      
+  xwaylandposx=$(xrandr | grep  XWAYLAND | cut -d '+' -f 2 | head -n $index | tail -1)
+  xwaylandposy=$(xrandr | grep  XWAYLAND | cut -d '+' -f 3 | awk '{print $1}' | head -n $index | tail -1)
+  let "index++"
+done 
+
+xwaylanddisplay=$(xrandr | grep XWAYLAND | head -n $index | tail -1 | awk '{print $1}')
+xrandr --output $xwaylanddisplay --primary
+touch /home/madison/test/touchfile
+}
+  
+trap main USR1
+while true
+do
+  sleep 10
+done
