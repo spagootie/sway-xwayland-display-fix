@@ -27,7 +27,6 @@ done
 
 xwaylanddisplay=$(xrandr | grep XWAYLAND | head -n $index | tail -1 | awk '{print $1}')
 xrandr --output $xwaylanddisplay --primary
-touch /home/madison/test/touchfile
 }
   
 trap main USR1
